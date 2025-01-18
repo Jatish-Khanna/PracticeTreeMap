@@ -52,18 +52,49 @@ public class StoreInventorySystem {
   private final TreeMap<Integer, Set<Item>> itemsByPrice = new TreeMap<>();
   private final Map<Integer, Item> itemsById = new HashMap<>();
 
+  /**
+   * firstEntry() on a TreeMap takes O(log N) time, where N is the number of distinct prices (keys) in the TreeMap.
+   *
+   * @return
+   */
   private Set<Item> getLeastExpensiveItem() {
     return itemsByPrice.firstEntry().getValue();
   }
 
+  /**
+   * lastEntry() on a TreeMap is also O(log N).
+   *
+   * @return
+   */
   private Set<Item> getMostExpensiveItem() {
     return itemsByPrice.lastEntry().getValue();
   }
 
+  /**
+   * The subMap(start, true, end, true) operation retrieves all the entries between start and end (inclusive).
+   * Since TreeMap is a balanced tree structure, the time complexity for the subMap operation is O(log N + K), where:
+   * O(log N) for finding the boundaries (start and end).
+   * O(K) for iterating through the entries between start and end, where K is the number of entries in the range.
+   * Therefore, the time complexity for this operation is O(log N + K).
+   *
+   * @param start
+   * @param end
+   * @return
+   */
   private Map<Integer, Set<Item>> getItemsInPriceRange(int start, int end) {
     return itemsByPrice.subMap(start, true, end, true);
   }
 
+  /**
+   * containsKey(id) in itemsById is O(1) (since it's a HashMap).
+   * get(id) in itemsById is also O(1).
+   * lowerEntry(price) in TreeMap is O(log N).
+   * Returning the value associated with the lower entry is a simple lookup in a Set, which is O(1).
+   * Therefore, the overall complexity is O(log N).
+   *
+   * @param id
+   * @return
+   */
   private Set<Item> getItemJustCheaperThan(int id) {
     if (!itemsById.containsKey(id)) {
       return Set.of();
@@ -73,6 +104,15 @@ public class StoreInventorySystem {
     return lowerPrice == null ? Set.of() : lowerPrice.getValue();
   }
 
+  /**
+   * containsKey(id) and get(id) are both O(1).
+   * higherEntry(price) in TreeMap is O(log N).
+   * Returning the value associated with the higher entry is O(1).
+   * Overall, the time complexity is O(log N).
+   *
+   * @param id
+   * @return
+   */
   private Set<Item> getItemJustMoreExpensiveThan(int id) {
     if (!itemsById.containsKey(id)) {
       return Set.of();
@@ -82,6 +122,14 @@ public class StoreInventorySystem {
     return lowerPrice == null ? Set.of() : lowerPrice.getValue();
   }
 
+  /**
+   * containsKey(id) and get(id) are O(1).
+   * higherKey(price) in TreeMap is O(log N).
+   * Thus, the overall time complexity is O(log N).
+   *
+   * @param id
+   * @return
+   */
   private Integer getNextHigherPrice(int id) {
     if (!itemsById.containsKey(id)) {
       return -1;
@@ -91,6 +139,16 @@ public class StoreInventorySystem {
     return higherPrice == null ? -1 : higherPrice;
   }
 
+  /**
+   * containsKey(id) and get(id) are O(1).
+   * headMap(price, false) in TreeMap is O(log N + K), where:
+   * O(log N) to find the boundary.
+   * O(K) to iterate through the entries with prices strictly less than item.price.
+   * Therefore, the overall time complexity is O(log N + K).
+   *
+   * @param id
+   * @return
+   */
   private Map<Integer, Set<Item>> getAllItemsCheaperThan(int id) {
     if (!itemsById.containsKey(id)) {
       return Map.of();
@@ -99,6 +157,16 @@ public class StoreInventorySystem {
     return itemsByPrice.headMap(item.price, false);
   }
 
+  /**
+   * containsKey(id) and get(id) are O(1).
+   * tailMap(price, false) in TreeMap is O(log N + K), where:
+   * O(log N) to find the boundary.
+   * O(K) to iterate through the entries with prices strictly greater than item.price.
+   * Therefore, the overall time complexity is O(log N + K).
+   *
+   * @param id
+   * @return
+   */
   private Map<Integer, Set<Item>> getAllItemsMoreExpensiveThan(int id) {
     if (!itemsById.containsKey(id)) {
       return Map.of();
@@ -107,36 +175,64 @@ public class StoreInventorySystem {
     return itemsByPrice.tailMap(item.price, false);
   }
 
+  /**
+   * containsKey(id) and get(id) in itemsById are O(1).
+   * remove(id) in itemsById is O(1).
+   * remove(item) from itemsByPrice is O(log N) for locating the price group in the TreeMap and O(1) for removing the item from the Set.
+   * Removing the price entry if empty is O(1).
+   * Therefore, the overall time complexity is O(log N).
+   *
+   * @param id
+   * @return
+   */
   private Item removeItem(int id) {
     if (!itemsById.containsKey(id)) {
       return null;
     }
-    Item item = itemsById.remove(id);
-    itemsByPrice.get(item.price).remove(item);
+    Item item = itemsById.remove(id); // O(1)
+    itemsByPrice.get(item.price).remove(item); // O(1) HashSet - find the item
     if (itemsByPrice.get(item.price).isEmpty()) {
-      itemsByPrice.remove(item.price);
+      itemsByPrice.remove(item.price); // O(log n) remove the item from TreeMap
     }
     return item;
   }
 
+  /**
+   * get(id) in itemsById is O(1).
+   * Thus, the time complexity is O(1).
+   *
+   * @param id
+   * @return
+   */
   private int getItemPrice(int id) {
     Item item = itemsById.get(id);
     return item == null ? -1 : item.price;
   }
 
+  /**
+   * get(id) in itemsById is O(1).
+   * removeItem(id) has a complexity of O(log N) (as it involves removing the item from TreeMap).
+   * computeIfAbsent(price, ...) in TreeMap is O(log N) to locate or insert the price group.
+   * put(id, item) in itemsById is O(1).
+   * Overall, the complexity is O(log N).
+   *
+   * @param id
+   * @param price
+   */
+
   private void addItem(int id, int price) {
-    Item item = itemsById.get(id);
+    Item item = itemsById.get(id); // O(1) get the item by the id
     if (item != null && item.price == price) {
       return;
     } else if (item != null) { // price isn't same as current item
-      removeItem(id);
+      removeItem(id); // O(log n) remove from the treeMap
       item.price = price;
     } else {
       item = new Item(id, price);
     }
 
-    itemsByPrice.computeIfAbsent(price, (val) -> new HashSet<>()).add(item);
-    itemsById.put(id, item);
+    itemsByPrice.computeIfAbsent(price, (val) -> new HashSet<>()).add(item); // add to treeMap log n and add to set O(1)
+    itemsById.put(id, item); // O(1) add to hash map
   }
 
   public static void main(String[] args) {
