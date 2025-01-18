@@ -96,7 +96,7 @@ public class StoreInventorySystem {
       return Map.of();
     }
     Item item = itemsById.get(id);
-    return itemsByPrice.headMap(item.price);
+    return itemsByPrice.headMap(item.price, false);
   }
 
   private Map<Integer, Set<Item>> getAllItemsMoreExpensiveThan(int id) {
@@ -104,7 +104,7 @@ public class StoreInventorySystem {
       return Map.of();
     }
     Item item = itemsById.get(id);
-    return itemsByPrice.tailMap(item.price);
+    return itemsByPrice.tailMap(item.price, false);
   }
 
   private Item removeItem(int id) {
@@ -113,6 +113,9 @@ public class StoreInventorySystem {
     }
     Item item = itemsById.remove(id);
     itemsByPrice.get(item.price).remove(item);
+    if (itemsByPrice.get(item.price).isEmpty()) {
+      itemsByPrice.remove(item.price);
+    }
     return item;
   }
 
@@ -155,7 +158,7 @@ public class StoreInventorySystem {
 
 // Get items with prices between 100 and 200
     System.out.println("Fetching items with prices between 100 and 200...");
-    System.out.println("Items with prices between 100 and 200 inclusive: " + store.getItemsInPriceRange(100, 200));  // Output: [1, 2]
+    System.out.println("Items with prices between 100 and 200: " + store.getItemsInPriceRange(100, 200));  // Output: [1, 2]
 
 // Get the most expensive item
     System.out.println("Fetching the most expensive item...");
@@ -167,18 +170,23 @@ public class StoreInventorySystem {
 
 // Get the item just cheaper than 170
     System.out.println("Fetching the item just cheaper than 170...");
-    System.out.println("Item just cheaper than 170: " + store.getItemJustCheaperThan(170));  // Output: Item ID: 1, Price: 100
+    System.out.println("Item just cheaper than 170: " + store.getItemJustCheaperThan(2));  // Output: Item ID: 1, Price: 100
 
 // Get the item just more expensive than 170
     System.out.println("Fetching the item just more expensive than 170...");
-    System.out.println("Item just more expensive than 170: " + store.getItemJustMoreExpensiveThan(170));  // Output: Item ID: 2, Price: 200
+    System.out.println("Item just more expensive than 170: " + store.getItemJustMoreExpensiveThan(4));  // Output: Item ID: 2, Price: 200
 
 // Get the next higher price after 150
     System.out.println("Fetching the next higher price after 150...");
-    System.out.println("Next higher price after 150: " + store.getNextHigherPrice(150));  // Output: 200
+    System.out.println("Next higher price after : " + store.getNextHigherPrice(1));  // Output: 200
 
-// Get all ite
+// Get all items cheaper than 150
+    System.out.println("Fetching all items cheaper than ...");
+    System.out.println("Items cheaper than : " + store.getAllItemsCheaperThan(2));  // Output: [1, 4]
 
+// Get all items more expensive than 150
+    System.out.println("Fetching all items more expensive than ...");
+    System.out.println("Items more expensive than : " + store.getAllItemsMoreExpensiveThan(4));  // Output: [2]
 
   }
 
