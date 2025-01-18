@@ -35,6 +35,17 @@ import java.util.*;
 
 public class StoreInventorySystem {
 
+  /**
+   * Summary of Time Complexities:
+   * O(log N): For operations involving TreeMap search or insertion
+   * (like getLeastExpensiveItem, getMostExpensiveItem, getItemJustCheaperThan, etc.).
+   * <p>
+   * O(log N + K): For operations that return multiple entries
+   * from the TreeMap (like getItemsInPriceRange, getAllItemsCheaperThan, and getAllItemsMoreExpensiveThan).
+   * <p>
+   * O(1): For operations involving HashMap lookups (getItemPrice, containsKey, etc.).
+   */
+
   static class Item {
     int id;
     int price;
