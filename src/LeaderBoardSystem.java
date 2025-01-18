@@ -40,9 +40,10 @@ public class LeaderBoardSystem {
   }
 
   private int computeRank(int score) {
-    var highest = leaderboard.firstKey();
+//    var highest = leaderboard.firstKey();
 
-    return leaderboard.subMap(highest, true, score, true).size(); //  including the lowest
+//    int rank = leaderboard.subMap(highest, true, score, true).size(); //  including the lowest
+    return leaderboard.headMap(score, true).size(); //  including the lowest
   }
 
   /**
