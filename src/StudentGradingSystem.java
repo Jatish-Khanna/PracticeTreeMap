@@ -51,7 +51,7 @@ public class StudentGradingSystem {
       student = removeStudent(name); // we have checked student will always exists
       student.grade = grade;
     }
-    studentsByName.put(name, new Student(name, grade));
+    studentsByName.put(name, student);
     studentsByGrade.computeIfAbsent(grade, (g) -> new HashSet<>()).add(student);
 
   }
